@@ -24,7 +24,11 @@ const DB = (() => {
         }
       };
       req.onsuccess = (e) => { db = e.target.result; resolve(db); };
-      req.onerror = () => reject(new Error("Failed to open IndexedDB"));
+      req.onerror = (e) => {
+        const name = e.target.error?.name || "UnknownError";
+        const msg = e.target.error?.message || "";
+        reject(new Error("IndexedDB open failed: " + name + (msg ? " — " + msg : "")));
+      };
       req.onblocked = () => reject(new Error("IndexedDB blocked — close other Pigeon Scratch tabs and refresh."));
     });
   }
