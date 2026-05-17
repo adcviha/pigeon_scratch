@@ -19,9 +19,15 @@
     console.error("Startup failed:", err);
     document.getElementById("main-content").innerHTML =
       '<div class="empty-state" style="color:#c62828;"><p><strong>Could not open local database.</strong></p><p>' +
-      err.message + '</p><p>Close all other Pigeon Scratch tabs, then refresh.</p>' +
-      '<p style="font-size:0.8rem;margin-top:8px;">If this persists, your browser may be blocking IndexedDB (private/incognito mode).</p></div>';
+      err.message + '</p><p>Close all other Pigeon Scratch tabs, then try one of these:</p>' +
+      '<p style="margin-top:12px;"><button id="reset-db-btn" style="background:#c62828;color:#fff;border:none;' +
+      'border-radius:4px;padding:8px 18px;font-size:0.9rem;cursor:pointer;font-weight:500;">Reset Database</button></p>' +
+      '<p style="font-size:0.75rem;color:var(--text-muted);margin-top:6px;">This deletes all local data. You will need to re-import your CSVs.</p></div>';
     document.getElementById("stats-bar").textContent = "Database unavailable.";
+    document.getElementById("reset-db-btn").addEventListener("click", () => {
+      indexedDB.deleteDatabase("pigeon-scratch");
+      location.reload();
+    });
   }
 
   if (!ok) {
@@ -49,5 +55,5 @@
     get merchants() { return State.getUncategorizedMerchants(); },
   };
 
-  console.log("Pigeon Scratch v0.2.2 ready. Try PIGEON.txns or PIGEON.merchants in the console.");
+  console.log("Pigeon Scratch v0.2.3 ready. Try PIGEON.txns or PIGEON.merchants in the console.");
 })();
