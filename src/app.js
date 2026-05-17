@@ -25,8 +25,13 @@
       '<p style="font-size:0.75rem;color:var(--text-muted);margin-top:6px;">This deletes all local data. You will need to re-import your CSVs.</p></div>';
     document.getElementById("stats-bar").textContent = "Database unavailable.";
     document.getElementById("reset-db-btn").addEventListener("click", () => {
-      indexedDB.deleteDatabase("pigeon-scratch");
-      location.reload();
+      const btn = document.getElementById("reset-db-btn");
+      btn.disabled = true;
+      btn.textContent = "Deleting...";
+      const req = indexedDB.deleteDatabase("pigeon-scratch");
+      req.onsuccess = () => location.reload();
+      req.onerror = () => { btn.textContent = "Delete failed. Try console method below."; btn.disabled = false; };
+      req.onblocked = () => { btn.textContent = "Blocked — close all other tabs first"; btn.disabled = false; };
     });
   }
 
@@ -55,5 +60,5 @@
     get merchants() { return State.getUncategorizedMerchants(); },
   };
 
-  console.log("Pigeon Scratch v0.2.3 ready. Try PIGEON.txns or PIGEON.merchants in the console.");
+  console.log("Pigeon Scratch v0.2.4 ready. Try PIGEON.txns or PIGEON.merchants in the console.");
 })();
