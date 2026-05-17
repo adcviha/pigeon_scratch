@@ -1,8 +1,9 @@
-// src/storage/db.js — IndexedDB wrapper for transactions
+// src/storage/db.js — IndexedDB wrapper for transactions + merchant dictionary
 const DB = (() => {
   const DB_NAME = "pigeon-scratch";
-  const DB_VERSION = 1;
-  const STORE = "transactions";
+  const DB_VERSION = 2;
+  const STORE_TXN = "transactions";
+  const STORE_DICT = "merchantDict";
 
   let db = null;
 
@@ -10,9 +11,12 @@ const DB = (() => {
     return new Promise((resolve, reject) => {
       const req = indexedDB.open(DB_NAME, DB_VERSION);
       req.onupgradeneeded = (e) => {
-        const db = e.target.result;
-        if (!db.objectStoreNames.contains(STORE)) {
-          db.createObjectStore(STORE, { keyPath: "id" });
+        const d = e.target.result;
+        if (!d.objectStoreNames.contains(STORE_TXN)) {
+          d.createObjectStore(STORE_TXN, { keyPath: "id" });
+        }
+        if (!d.objectStoreNames.contains(STORE_DICT)) {
+          d.createObjectStore(STORE_DICT, { keyPath: "merchantClean" });
         }
       };
       req.onsuccess = (e) => { db = e.target.result; resolve(db); };
@@ -22,8 +26,8 @@ const DB = (() => {
 
   function readAll() {
     return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORE, "readonly");
-      const store = tx.objectStore(STORE);
+      const tx = db.transaction(STORE_TXN, "readonly");
+      const store = tx.objectStore(STORE_TXN);
       const req = store.getAll();
       req.onsuccess = () => resolve(req.result);
       req.onerror = () => reject(new Error("Failed to read transactions"));
@@ -32,11 +36,9 @@ const DB = (() => {
 
   function writeBatch(transactions) {
     return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORE, "readwrite");
-      const store = tx.objectStore(STORE);
-      for (const txn of transactions) {
-        store.put(txn);
-      }
+      const tx = db.transaction(STORE_TXN, "readwrite");
+      const store = tx.objectStore(STORE_TXN);
+      for (const txn of transactions) store.put(txn);
       tx.oncomplete = () => resolve();
       tx.onerror = () => reject(new Error("Failed to write transactions"));
     });
@@ -44,13 +46,34 @@ const DB = (() => {
 
   function count() {
     return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORE, "readonly");
-      const store = tx.objectStore(STORE);
-      const req = store.count();
+      const tx = db.transaction(STORE_TXN, "readonly");
+      const req = tx.objectStore(STORE_TXN).count();
       req.onsuccess = () => resolve(req.result);
       req.onerror = () => reject(new Error("Failed to count transactions"));
     });
   }
 
-  return { open, readAll, writeBatch, count };
+  // --- Merchant dictionary store ---
+
+  function readAllDict() {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_DICT, "readonly");
+      const store = tx.objectStore(STORE_DICT);
+      const req = store.getAll();
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(new Error("Failed to read dictionary"));
+    });
+  }
+
+  function writeDictBatch(entries) {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_DICT, "readwrite");
+      const store = tx.objectStore(STORE_DICT);
+      for (const e of entries) store.put(e);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(new Error("Failed to write dictionary"));
+    });
+  }
+
+  return { open, readAll, writeBatch, count, readAllDict, writeDictBatch };
 })();

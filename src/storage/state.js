@@ -40,5 +40,56 @@ const State = (() => {
     return [...set].sort();
   }
 
-  return { onChange, getTransactions, setTransactions, addTransactions, getAccounts };
+  function updateCategory(merchantClean, category) {
+    let changed = 0;
+    for (const t of transactions) {
+      if (t.merchantClean === merchantClean && t.category !== category) {
+        t.category = category;
+        changed++;
+      }
+    }
+    if (changed) notify();
+    return changed;
+  }
+
+  function applyDict(dictCache) {
+    let changed = false;
+    for (const t of transactions) {
+      if (!t.category && dictCache.has(t.merchantClean)) {
+        t.category = dictCache.get(t.merchantClean);
+        changed = true;
+      }
+    }
+    if (changed) notify();
+    return changed;
+  }
+
+  function getUncategorizedMerchants() {
+    const uncategorized = new Set();
+    const categorized = new Set();
+    for (const t of transactions) {
+      if (!t.category && t.merchantClean) {
+        uncategorized.add(t.merchantClean);
+      } else if (t.category && t.merchantClean) {
+        categorized.add(t.merchantClean);
+      }
+    }
+    return [...uncategorized].filter(m => !categorized.has(m));
+  }
+
+  function getMerchantCounts() {
+    const counts = {};
+    for (const t of transactions) {
+      if (!t.merchantClean) continue;
+      if (!counts[t.merchantClean]) {
+        counts[t.merchantClean] = { count: 0, category: t.category };
+      }
+      counts[t.merchantClean].count++;
+      if (t.category) counts[t.merchantClean].category = t.category;
+    }
+    return counts;
+  }
+
+  return { onChange, getTransactions, setTransactions, addTransactions, getAccounts,
+           updateCategory, applyDict, getUncategorizedMerchants, getMerchantCounts };
 })();

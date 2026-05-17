@@ -55,11 +55,11 @@ If a feature doesn't help answer one of these, it probably doesn't belong.
 These are the planned Minor-version milestones. Each is one feature, shipped end-to-end before the next begins.
 
 - **v0.1** — CSV import + local IndexedDB + transaction list view.
-- **v0.2** — Categorization (manual) + merchant dictionary.
+- **v0.1** — CSV import + local IndexedDB + transaction list view.
+- **v0.2** — Categorization + merchant dictionary + AI Suggest.
 - **v0.3** — Recurring detection + dashboard.
 - **v0.4** — Encrypted GitHub repo sync.
-- **v0.5** — DeepSeek-assisted categorization for new merchants.
-- **v0.6** — Narrator paragraph on monthly review.
-- **v0.7** — Ask Pigeon.
-- **v0.8** — Settings, wipe-local, multi-device polish.
+- **v0.5** — Narrator paragraph on monthly review.
+- **v0.6** — Ask Pigeon.
+- **v0.7** — Settings, wipe-local, multi-device polish.
 - **v1.0** — Stable data format. Pigeon Scratch is in regular use.

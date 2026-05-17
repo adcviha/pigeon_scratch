@@ -47,7 +47,7 @@ The app is split into discrete modules so they can be worked on independently. E
 
 ### 4. `categorize/` — Merchant dictionary and recurring detection
 - Local merchant→category dictionary built up over time.
-- User-facing categories: **Food, Bills, Extra**. Plus **Income** and **Transfer** for the math.
+- User-facing categories: **Bills, Discretionary, Income**. Plus **Transfer** for inter-account moves.
 - Recurring detection: same merchant + similar amount + regular cadence → flagged as recurring.
 - New merchants surfaced for user labeling. AI assist (via `ai/`) optional.
 
@@ -76,7 +76,7 @@ The app is split into discrete modules so they can be worked on independently. E
   amount: -48.32,              // negative = outflow, positive = inflow
   merchantRaw: "SQ *AC HARDWARE 412",
   merchantClean: "AC HARDWARE",
-  category: "Extra",           // Food | Bills | Extra | Income | Transfer
+  category: "Discretionary",    // Bills | Discretionary | Income | Transfer
   isRecurring: false,
   account: "visa",             // user-defined account label
   notes: ""
@@ -87,7 +87,7 @@ The app is split into discrete modules so they can be worked on independently. E
 ```js
 {
   pattern: "AC HARDWARE",      // matched against merchantClean
-  category: "Extra",
+  category: "Discretionary",
   isRecurring: false,
   labelledBy: "user",          // user | ai | rule
   confirmedAt: "2025-09-14"
@@ -171,7 +171,7 @@ These are hard rules, not preferences.
 Located in `ai/prompts.js`. Each prompt is a function returning a system message + user message.
 
 ### Categorization
-- **System**: "You categorize cleaned merchant strings into one of: Food, Bills, Extra. Respond with a JSON array of `{merchant, category}` only. No prose."
+- **System**: "You categorize cleaned merchant strings into one of: Bills, Discretionary, Income. Respond with a JSON object of `{"Merchant": "Category"}`. No prose."
 - **User**: JSON array of merchant strings.
 
 ### Narrator

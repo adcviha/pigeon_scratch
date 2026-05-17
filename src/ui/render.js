@@ -1,10 +1,28 @@
-// src/ui/render.js — transaction list view
+// src/ui/render.js — view controller + transaction list
 const Render = (() => {
   const el = document.getElementById("main-content");
   const statsEl = document.getElementById("stats-bar");
+  const toolbar = document.getElementById("view-toolbar");
 
+  let viewMode = "transactions";
   let sortKey = "date";
-  let sortDir = "desc"; // newest first
+  let sortDir = "desc";
+
+  const CAT_EMOJI = {
+    Bills: "🧾",
+    Discretionary: "😜",
+    Income: "😌💵",
+    Transfer: "🔄",
+  };
+
+  function setView(mode) {
+    viewMode = mode;
+    render(State.getTransactions());
+  }
+
+  function getView() {
+    return viewMode;
+  }
 
   function formatCurrency(n) {
     const abs = Math.abs(n);
@@ -13,7 +31,6 @@ const Render = (() => {
 
   function formatDate(d) {
     if (!d) return "";
-    // Convert ISO to a friendly format like Jan 14, 2025
     const [y, m, day] = d.split("-");
     const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
     return months[parseInt(m,10)-1] + " " + parseInt(day,10) + ", " + y;
@@ -23,18 +40,41 @@ const Render = (() => {
     return "cat-" + (cat || "null");
   }
 
+  function catDisplay(cat) {
+    if (!cat) return "—";
+    const emoji = CAT_EMOJI[cat] || "";
+    return emoji + " " + cat;
+  }
+
   function renderStats(txns) {
     const total = txns.length;
+    const categorized = txns.filter(t => t.category).length;
     const inflow = txns.filter(t => t.amount > 0 && t.category !== "Transfer").reduce((s,t) => s + t.amount, 0);
     const outflow = txns.filter(t => t.amount < 0 && t.category !== "Transfer").reduce((s,t) => s + Math.abs(t.amount), 0);
     const accounts = new Set(txns.map(t => t.account).filter(Boolean));
-    statsEl.textContent = `${total} transactions across ${accounts.size} account(s) · In: ${formatCurrency(inflow)} · Out: ${formatCurrency(outflow)}`;
+    let text = `${total} transactions across ${accounts.size} account(s) · In: ${formatCurrency(inflow)} · Out: ${formatCurrency(outflow)}`;
+    if (total) {
+      text += ` · ${categorized}/${total} categorized (${Math.round(categorized/total*100)}%)`;
+    }
+    statsEl.textContent = text;
   }
 
   function buildTable(txns) {
     if (!txns.length) {
       el.innerHTML = '<div class="empty-state"><p>No transactions yet.</p><p>Pick an account name, choose a CSV file, and hit Import.</p></div>';
+      if (toolbar) toolbar.style.display = "none";
       return;
+    }
+
+    if (toolbar) toolbar.style.display = "flex";
+
+    // Highlight active tab button
+    if (toolbar) {
+      toolbar.querySelectorAll("button").forEach(b => {
+        const active = b.dataset.view === viewMode;
+        b.style.background = active ? "var(--accent)" : "transparent";
+        b.style.color = active ? "#fff" : "var(--text)";
+      });
     }
 
     const sorted = [...txns].sort((a, b) => {
@@ -49,13 +89,12 @@ const Render = (() => {
 
     const rows = sorted.map(t => {
       const amtClass = t.amount >= 0 ? "amount-in" : "amount-out";
-      const cat = t.category || "—";
       return `
         <tr>
           <td>${formatDate(t.date)}</td>
           <td>${esc(t.merchantClean)}</td>
           <td class="${amtClass}">${t.amount >= 0 ? "+" : "−"}${formatCurrency(t.amount)}</td>
-          <td><span class="cat-tag ${catClass(t.category)}">${esc(cat)}</span></td>
+          <td><span class="cat-tag ${catClass(t.category)}">${catDisplay(t.category)}</span></td>
           <td>${esc(t.account)}</td>
         </tr>`;
     }).join("");
@@ -74,7 +113,6 @@ const Render = (() => {
         <tbody>${rows}</tbody>
       </table>`;
 
-    // Click-to-sort headers
     el.querySelectorAll("th[data-sort]").forEach(th => {
       th.addEventListener("click", () => {
         const key = th.dataset.sort;
@@ -93,8 +131,32 @@ const Render = (() => {
 
   function render(txns) {
     renderStats(txns);
-    buildTable(txns);
+
+    if (!txns.length) {
+      el.innerHTML = '<div class="empty-state"><p>No transactions yet.</p><p>Pick an account name, choose a CSV file, and hit Import.</p></div>';
+      if (toolbar) toolbar.style.display = "none";
+      return;
+    }
+
+    if (toolbar) toolbar.style.display = "flex";
+
+    // Highlight active tab button
+    if (toolbar) {
+      toolbar.querySelectorAll("button").forEach(b => {
+        const active = b.dataset.view === viewMode;
+        b.style.background = active ? "var(--accent)" : "transparent";
+        b.style.color = active ? "#fff" : "var(--text)";
+      });
+    }
+
+    if (viewMode === "categorize") {
+      CategorizeUI.render();
+    } else if (viewMode === "settings") {
+      SettingsUI.render();
+    } else {
+      buildTable(txns);
+    }
   }
 
-  return { render };
+  return { render, setView, getView };
 })();

@@ -48,6 +48,11 @@ const ImportFlow = (() => {
     setMsg("Saving…");
     const added = State.addTransactions(txns);
 
+    // Auto-categorize against known merchants
+    if (typeof MerchantDict !== "undefined" && MerchantDict.cache.size) {
+      State.applyDict(MerchantDict.cache);
+    }
+
     try {
       await DB.writeBatch(txns);
     } catch (err) {
@@ -62,7 +67,6 @@ const ImportFlow = (() => {
 
   importBtn.addEventListener("click", doImport);
 
-  // Init: populate account datalist from existing data
   function init() {
     updateAccountDatalist();
   }

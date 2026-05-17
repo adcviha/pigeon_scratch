@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pigeon Scratch</title>
+  <title>🪶 Pigeon Scratch</title>
   <style>
     :root {
       --bg: #fafaf8;
@@ -74,12 +74,11 @@
       display: inline-block; padding: 1px 6px; border-radius: 3px;
       font-size: 0.75rem; font-weight: 500;
     }
-    .cat-Food     { background: #e8f5e9; color: #2e7d32; }
-    .cat-Bills    { background: #e3f2fd; color: #1565c0; }
-    .cat-Extra    { background: #f3e5f5; color: #7b1fa2; }
-    .cat-Income   { background: #fff3e0; color: #e65100; }
-    .cat-Transfer { background: #f5f5f5; color: #757575; }
-    .cat-null     { background: #fafafa; color: #aaa; }
+    .cat-Bills          { background: #e3f2fd; color: #1565c0; }
+    .cat-Discretionary  { background: #fff3e0; color: #e65100; }
+    .cat-Income         { background: #e8f5e9; color: #2e7d32; }
+    .cat-Transfer       { background: #f5f5f5; color: #757575; }
+    .cat-null           { background: #fafafa; color: #aaa; }
 
     .empty-state {
       text-align: center; padding: 60px 20px; color: var(--text-muted);
@@ -89,8 +88,8 @@
 </head>
 <body>
   <header>
-    <h1>Pigeon Scratch</h1>
-    <span class="version">v0.1.2</span>
+    <h1>🪶 Pigeon Scratch</h1>
+    <span class="version">v0.2.0</span>
   </header>
 
   <div class="import-bar">
@@ -104,6 +103,12 @@
 
   <div class="stats" id="stats-bar"></div>
 
+  <div id="view-toolbar" style="display:none; margin-bottom:16px; gap:8px;">
+    <button data-view="transactions" style="border:1px solid var(--border);border-radius:4px;padding:5px 14px;font-size:0.85rem;cursor:pointer;">Transactions</button>
+    <button data-view="categorize" style="border:1px solid var(--border);border-radius:4px;padding:5px 14px;font-size:0.85rem;cursor:pointer;">Categorize</button>
+    <button data-view="settings" style="border:1px solid var(--border);border-radius:4px;padding:5px 14px;font-size:0.85rem;cursor:pointer;">Settings</button>
+  </div>
+
   <div id="main-content">
     <div class="empty-state">
       <p>No transactions yet.</p>
@@ -112,12 +117,17 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <script src="src/import/parser.js?v=012"></script>
-  <script src="src/import/normalize.js?v=012"></script>
-  <script src="src/storage/db.js?v=012"></script>
-  <script src="src/storage/state.js?v=012"></script>
-  <script src="src/ui/render.js?v=012"></script>
-  <script src="src/ui/importFlow.js?v=012"></script>
-  <script src="src/app.js?v=012"></script>
+  <script src="src/import/parser.js?v=020"></script>
+  <script src="src/import/normalize.js?v=020"></script>
+  <script src="src/storage/db.js?v=020"></script>
+  <script src="src/storage/dict.js?v=020"></script>
+  <script src="src/storage/state.js?v=020"></script>
+  <script src="src/ui/render.js?v=020"></script>
+  <script src="src/ui/importFlow.js?v=020"></script>
+  <script src="src/ai/prompts.js?v=020"></script>
+  <script src="src/ai/suggest.js?v=020"></script>
+  <script src="src/ui/categorize.js?v=020"></script>
+  <script src="src/ui/settings.js?v=020"></script>
+  <script src="src/app.js?v=020"></script>
 </body>
 </html>

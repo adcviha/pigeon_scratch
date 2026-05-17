@@ -105,8 +105,8 @@ Watch for these — they came up in design conversations:
 - **Visa-payment double-counting.** Credit card payments appearing as outflows on the bank statement AND as the originating purchases on the Visa statement. The fix: tag transfers, exclude from spending math.
 - **Sending raw transactions to AI.** Easy to slip into. The categorization and Ask Pigeon prompts in `ai/prompts.js` define what's allowed to leave the device — enforce in `ai/` at the call site.
 - **PAT scope creep.** The GitHub PAT needs `repo` scope only. Don't ask for more.
-- **Over-categorization.** Three user-facing categories: Food, Bills, Extra (plus Income and Transfer for math). Don't add categories without a `design.md` conversation first.
-- **Treating "Extra" as something to break down.** It's intentionally a catch-all. The way you keep an eye on it is the top-5 surface, not sub-categories.
+- **Over-categorization.** Three user-facing categories: Bills, Discretionary, Income (plus Transfer for inter-account moves). Don't add categories without a `design.md` conversation first.
+- **Treating "Discretionary" as something to break down.** It's intentionally a catch-all for variable spending. The way you keep an eye on it is the top-5 surface, not sub-categories.
 - **Storing the passphrase or derived key.** Only the verifier hash. The key is derived per-session from the user's typed passphrase.
 
 ## How to run locally
