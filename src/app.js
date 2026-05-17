@@ -32,5 +32,5 @@
     get accounts() { return State.getAccounts(); },
   };
 
-  console.log("Pigeon Scratch v0.1.1 ready. Try PIGEON.txns in the console.");
+  console.log("Pigeon Scratch v0.1.2 ready. Try PIGEON.txns in the console.");
 })();
