@@ -7,6 +7,10 @@ const DB = (() => {
 
   let db = null;
 
+  function ensure() {
+    if (!db) throw new Error("Database not open. Try refreshing the page.");
+  }
+
   function open() {
     return new Promise((resolve, reject) => {
       const req = indexedDB.open(DB_NAME, DB_VERSION);
@@ -21,10 +25,16 @@ const DB = (() => {
       };
       req.onsuccess = (e) => { db = e.target.result; resolve(db); };
       req.onerror = () => reject(new Error("Failed to open IndexedDB"));
+      req.onblocked = () => reject(new Error("IndexedDB blocked — close other Pigeon Scratch tabs and refresh."));
     });
   }
 
+  function isOpen() {
+    return db !== null;
+  }
+
   function readAll() {
+    ensure();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_TXN, "readonly");
       const store = tx.objectStore(STORE_TXN);
@@ -35,6 +45,7 @@ const DB = (() => {
   }
 
   function writeBatch(transactions) {
+    ensure();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_TXN, "readwrite");
       const store = tx.objectStore(STORE_TXN);
@@ -45,6 +56,7 @@ const DB = (() => {
   }
 
   function count() {
+    ensure();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_TXN, "readonly");
       const req = tx.objectStore(STORE_TXN).count();
@@ -56,6 +68,7 @@ const DB = (() => {
   // --- Merchant dictionary store ---
 
   function readAllDict() {
+    ensure();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_DICT, "readonly");
       const store = tx.objectStore(STORE_DICT);
@@ -66,6 +79,7 @@ const DB = (() => {
   }
 
   function writeDictBatch(entries) {
+    ensure();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_DICT, "readwrite");
       const store = tx.objectStore(STORE_DICT);
@@ -75,5 +89,5 @@ const DB = (() => {
     });
   }
 
-  return { open, readAll, writeBatch, count, readAllDict, writeDictBatch };
+  return { open, isOpen, readAll, writeBatch, count, readAllDict, writeDictBatch };
 })();

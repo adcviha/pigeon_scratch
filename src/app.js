@@ -6,7 +6,6 @@
     const stored = await DB.readAll();
     if (stored.length) {
       State.setTransactions(stored);
-      // Apply existing dictionary to any uncategorized transactions
       if (MerchantDict.cache.size) {
         const changed = State.applyDict(MerchantDict.cache);
         if (changed) {
@@ -16,6 +15,9 @@
     }
   } catch (err) {
     console.error("Failed to load from IndexedDB:", err);
+    document.getElementById("main-content").innerHTML =
+      '<div class="empty-state" style="color:#c62828;"><p>Could not open local database.</p><p>' +
+      err.message + '</p><p>If you have another Pigeon Scratch tab open, close it and refresh.</p></div>';
   }
 
   ImportFlow.init();
@@ -49,5 +51,5 @@
     get merchants() { return State.getUncategorizedMerchants(); },
   };
 
-  console.log("Pigeon Scratch v0.2.0 ready. Try PIGEON.txns or PIGEON.merchants in the console.");
+  console.log("Pigeon Scratch v0.2.1 ready. Try PIGEON.txns or PIGEON.merchants in the console.");
 })();
