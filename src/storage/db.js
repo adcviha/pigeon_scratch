@@ -6,13 +6,19 @@ const DB = (() => {
   const STORE_DICT = "merchantDict";
 
   let db = null;
+  let openPromise = null;
 
-  function ensure() {
-    if (!db) throw new Error("Database not open. Try refreshing the page.");
+  async function ensure() {
+    if (db) return;
+    console.warn("DB connection lost — attempting to reopen");
+    db = null;
+    openPromise = null;
+    await open();
   }
 
   function open() {
-    return new Promise((resolve, reject) => {
+    if (openPromise) return openPromise;
+    openPromise = new Promise((resolve, reject) => {
       const req = indexedDB.open(DB_NAME, DB_VERSION);
       req.onupgradeneeded = (e) => {
         const d = e.target.result;
@@ -25,31 +31,33 @@ const DB = (() => {
       };
       req.onsuccess = (e) => { db = e.target.result; resolve(db); };
       req.onerror = (e) => {
+        openPromise = null;
         const name = e.target.error?.name || "UnknownError";
         const msg = e.target.error?.message || "";
         reject(new Error("IndexedDB open failed: " + name + (msg ? " — " + msg : "")));
       };
-      req.onblocked = () => reject(new Error("IndexedDB blocked — close other Pigeon Scratch tabs and refresh."));
+      req.onblocked = () => {
+        openPromise = null;
+        reject(new Error("IndexedDB blocked — close other Pigeon Scratch tabs and refresh."));
+      };
     });
+    return openPromise;
   }
 
-  function isOpen() {
-    return db !== null;
-  }
+  function isOpen() { return db !== null; }
 
-  function readAll() {
-    ensure();
+  async function readAll() {
+    await ensure();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_TXN, "readonly");
-      const store = tx.objectStore(STORE_TXN);
-      const req = store.getAll();
+      const req = tx.objectStore(STORE_TXN).getAll();
       req.onsuccess = () => resolve(req.result);
       req.onerror = () => reject(new Error("Failed to read transactions"));
     });
   }
 
-  function writeBatch(transactions) {
-    ensure();
+  async function writeBatch(transactions) {
+    await ensure();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_TXN, "readwrite");
       const store = tx.objectStore(STORE_TXN);
@@ -59,8 +67,8 @@ const DB = (() => {
     });
   }
 
-  function count() {
-    ensure();
+  async function count() {
+    await ensure();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_TXN, "readonly");
       const req = tx.objectStore(STORE_TXN).count();
@@ -69,21 +77,18 @@ const DB = (() => {
     });
   }
 
-  // --- Merchant dictionary store ---
-
-  function readAllDict() {
-    ensure();
+  async function readAllDict() {
+    await ensure();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_DICT, "readonly");
-      const store = tx.objectStore(STORE_DICT);
-      const req = store.getAll();
+      const req = tx.objectStore(STORE_DICT).getAll();
       req.onsuccess = () => resolve(req.result);
       req.onerror = () => reject(new Error("Failed to read dictionary"));
     });
   }
 
-  function writeDictBatch(entries) {
-    ensure();
+  async function writeDictBatch(entries) {
+    await ensure();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_DICT, "readwrite");
       const store = tx.objectStore(STORE_DICT);

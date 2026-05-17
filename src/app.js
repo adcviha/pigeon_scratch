@@ -60,5 +60,5 @@
     get merchants() { return State.getUncategorizedMerchants(); },
   };
 
-  console.log("Pigeon Scratch v0.2.4 ready. Try PIGEON.txns or PIGEON.merchants in the console.");
+  console.log("Pigeon Scratch v0.2.5 ready. Try PIGEON.txns or PIGEON.merchants in the console.");
 })();
