@@ -46,6 +46,7 @@
 
   State.onChange((txns) => Render.render(txns));
 
+  document.getElementById("view-dashboard-btn").addEventListener("click", () => Render.setView("dashboard"));
   document.getElementById("view-transactions-btn").addEventListener("click", () => Render.setView("transactions"));
   document.getElementById("view-categorize-btn").addEventListener("click", () => Render.setView("categorize"));
   document.getElementById("view-settings-btn").addEventListener("click", () => Render.setView("settings"));
@@ -53,6 +54,7 @@
   window.PIGEON = {
     State, DB, Parser, Normalize, Render, ImportFlow,
     MerchantDict, CategorizeUI, SettingsUI, AISuggest, Prompts,
+    Analyze, Recurring, DashboardUI,
     ok: true,
     get txns() { return State.getTransactions(); },
     get count() { return State.getTransactions().length; },
@@ -60,5 +62,5 @@
     get merchants() { return State.getUncategorizedMerchants(); },
   };
 
-  console.log("Pigeon Scratch v0.2.5 ready. Try PIGEON.txns or PIGEON.merchants in the console.");
+  console.log("Pigeon Scratch v0.3.0 ready. Try PIGEON.txns or PIGEON.merchants in the console.");
 })();

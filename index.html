@@ -84,12 +84,81 @@
       text-align: center; padding: 60px 20px; color: var(--text-muted);
     }
     .empty-state p { margin-bottom: 8px; }
+
+    /* Dashboard */
+    .dashboard-month-nav {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 20px; padding: 8px 0;
+    }
+    .dash-nav-btn {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 4px; padding: 4px 12px; font-size: 0.9rem;
+      cursor: pointer; color: var(--text);
+    }
+    .dash-nav-btn:hover:not(:disabled) { background: var(--accent); color: #fff; }
+    .dash-nav-btn:disabled { opacity: 0.3; cursor: default; }
+    .dash-month-label {
+      font-size: 1.2rem; font-weight: 600; min-width: 160px; text-align: center;
+    }
+    .dash-badge {
+      font-size: 0.75rem; background: #fff3e0; color: #e65100;
+      padding: 2px 8px; border-radius: 3px; font-weight: 500;
+    }
+    .dash-cards {
+      display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .dash-card {
+      flex: 1; min-width: 130px; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 16px; text-align: center;
+    }
+    .dash-card-label {
+      font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .dash-card-amount {
+      font-size: 1.3rem; font-weight: 600;
+    }
+    .dash-card-emoji { font-size: 1.2rem; margin-bottom: 4px; }
+    .dash-card-income .dash-card-amount { color: #2e7d32; }
+    .dash-card-bills .dash-card-amount { color: #1565c0; }
+    .dash-card-discretionary .dash-card-amount { color: #e65100; }
+    .dash-card-remainder-pos .dash-card-amount { color: #2e7d32; }
+    .dash-card-remainder-neg .dash-card-amount { color: #c62828; }
+
+    .dash-section {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 16px; margin-bottom: 16px;
+    }
+    .dash-section-title {
+      font-size: 0.9rem; font-weight: 600; margin-bottom: 12px;
+      color: var(--text-muted); text-transform: uppercase;
+    }
+    .dash-compare-table, .dash-recurring-table, .dash-top5-table {
+      width: 100%; border-collapse: collapse; font-size: 0.85rem;
+    }
+    .dash-compare-table td, .dash-recurring-table td, .dash-top5-table td,
+    .dash-compare-table th, .dash-recurring-table th, .dash-top5-table th {
+      padding: 6px 10px; text-align: left;
+    }
+    .dash-compare-table th, .dash-recurring-table th, .dash-top5-table th {
+      font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+    }
+    .delta-good { color: #2e7d32; font-weight: 500; }
+    .delta-bad { color: #c62828; font-weight: 500; }
+    .delta-neutral { color: var(--text-muted); }
+    .recurring-ended { opacity: 0.5; }
+    .recurring-total td { border-top: 1px solid var(--border); padding-top: 8px; }
+    .dash-empty-month {
+      color: var(--text-muted); font-size: 0.9rem; padding: 16px 0;
+    }
   </style>
 </head>
 <body>
   <header>
     <h1>🪶 Pigeon Scratch</h1>
-    <span class="version">v0.2.5</span>
+    <span class="version">v0.3.0</span>
   </header>
 
   <div class="import-bar">
@@ -104,6 +173,7 @@
   <div class="stats" id="stats-bar"></div>
 
   <div id="view-toolbar" style="display:none; margin-bottom:16px; gap:8px;">
+    <button id="view-dashboard-btn" data-view="dashboard" style="border:1px solid var(--border);border-radius:4px;padding:5px 14px;font-size:0.85rem;cursor:pointer;">Dashboard</button>
     <button id="view-transactions-btn" data-view="transactions" style="border:1px solid var(--border);border-radius:4px;padding:5px 14px;font-size:0.85rem;cursor:pointer;">Transactions</button>
     <button id="view-categorize-btn" data-view="categorize" style="border:1px solid var(--border);border-radius:4px;padding:5px 14px;font-size:0.85rem;cursor:pointer;">Categorize</button>
     <button id="view-settings-btn" data-view="settings" style="border:1px solid var(--border);border-radius:4px;padding:5px 14px;font-size:0.85rem;cursor:pointer;">Settings</button>
@@ -117,17 +187,20 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-  <script src="src/import/parser.js?v=025"></script>
-  <script src="src/import/normalize.js?v=025"></script>
-  <script src="src/storage/db.js?v=025"></script>
-  <script src="src/storage/dict.js?v=025"></script>
-  <script src="src/storage/state.js?v=025"></script>
-  <script src="src/ui/render.js?v=025"></script>
-  <script src="src/ui/importFlow.js?v=025"></script>
-  <script src="src/ai/prompts.js?v=025"></script>
-  <script src="src/ai/suggest.js?v=025"></script>
-  <script src="src/ui/categorize.js?v=025"></script>
-  <script src="src/ui/settings.js?v=025"></script>
-  <script src="src/app.js?v=025"></script>
+  <script src="src/import/parser.js?v=030"></script>
+  <script src="src/import/normalize.js?v=030"></script>
+  <script src="src/storage/db.js?v=030"></script>
+  <script src="src/storage/dict.js?v=030"></script>
+  <script src="src/storage/state.js?v=030"></script>
+  <script src="src/analyze/monthly.js?v=030"></script>
+  <script src="src/analyze/recurring.js?v=030"></script>
+  <script src="src/ui/render.js?v=030"></script>
+  <script src="src/ui/importFlow.js?v=030"></script>
+  <script src="src/ai/prompts.js?v=030"></script>
+  <script src="src/ai/suggest.js?v=030"></script>
+  <script src="src/ui/categorize.js?v=030"></script>
+  <script src="src/ui/settings.js?v=030"></script>
+  <script src="src/ui/dashboard.js?v=030"></script>
+  <script src="src/app.js?v=030"></script>
 </body>
 </html>

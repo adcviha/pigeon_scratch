@@ -4,7 +4,7 @@ const Render = (() => {
   const statsEl = document.getElementById("stats-bar");
   const toolbar = document.getElementById("view-toolbar");
 
-  let viewMode = "transactions";
+  let viewMode = "dashboard";
   let sortKey = "date";
   let sortDir = "desc";
 
@@ -153,6 +153,8 @@ const Render = (() => {
       CategorizeUI.render();
     } else if (viewMode === "settings") {
       SettingsUI.render();
+    } else if (viewMode === "dashboard") {
+      DashboardUI.render(txns);
     } else {
       buildTable(txns);
     }
