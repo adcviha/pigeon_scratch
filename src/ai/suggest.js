@@ -63,11 +63,11 @@ const AISuggest = (() => {
     try {
       parsed = JSON.parse(content);
     } catch (_) {
+      console.error("DeepSeek parse failed. finish_reason=" + finish + ". Full content:", content);
       const m = content.match(/\{[\s\S]*\}/);
-      const tail = content.length > 400 ? "…" + content.slice(-200) : "";
-      if (!m) throw new Error("No JSON object found. finish_reason=" + finish + " content: " + content.slice(0, 400) + tail);
+      if (!m) throw new Error("No JSON object found in model response. Check DevTools console for full output (finish_reason=" + finish + ").");
       try { parsed = JSON.parse(m[0]); } catch (_) {
-        throw new Error("JSON parse failed. finish_reason=" + finish + " content: " + content.slice(0, 400) + tail);
+        throw new Error("JSON parse failed after regex extraction. Check DevTools console for full output (finish_reason=" + finish + ").");
       }
     }
 
