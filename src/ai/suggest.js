@@ -45,7 +45,16 @@ const AISuggest = (() => {
     }
 
     let text;
-    try { text = await resp.text(); } catch (_) { text = ""; }
+    try {
+      text = await resp.text();
+    } catch (_) {
+      if (remaining > 1) {
+        console.warn("DeepSeek: body read failed, retrying (" + (remaining - 1) + " left)");
+        await sleep(1500);
+        return callWithRetry(apiKey, userMsg, remaining - 1);
+      }
+      throw new Error("Failed to read DeepSeek response body. Connection may have dropped.");
+    }
 
     if (!resp.ok) {
       let detail = "";
