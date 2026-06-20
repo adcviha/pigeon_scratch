@@ -55,7 +55,8 @@ const AISuggest = (() => {
     }
 
     const content = data.choices?.[0]?.message?.content;
-    if (!content) throw new Error("DeepSeek returned an empty response.");
+    const finish = data.choices?.[0]?.finish_reason || "unknown";
+    if (!content) throw new Error("DeepSeek returned empty content (finish_reason=" + finish + ").");
 
     // Parse the JSON from the content — try direct parse, then regex extraction
     let parsed;
@@ -63,9 +64,10 @@ const AISuggest = (() => {
       parsed = JSON.parse(content);
     } catch (_) {
       const m = content.match(/\{[\s\S]*\}/);
-      if (!m) throw new Error("Could not parse categorization JSON. Model returned: " + content.slice(0, 400));
+      const tail = content.length > 400 ? "…" + content.slice(-200) : "";
+      if (!m) throw new Error("No JSON object found. finish_reason=" + finish + " content: " + content.slice(0, 400) + tail);
       try { parsed = JSON.parse(m[0]); } catch (_) {
-        throw new Error("Could not parse categorization JSON. Model returned: " + content.slice(0, 400));
+        throw new Error("JSON parse failed. finish_reason=" + finish + " content: " + content.slice(0, 400) + tail);
       }
     }
 
