@@ -8,13 +8,20 @@ const AISuggest = (() => {
     return localStorage.getItem(LS_KEY);
   }
 
+  const BATCH_SIZE = 40;
+
   async function suggest(merchants) {
     const apiKey = getKey();
     if (!apiKey) throw new Error("No API key. Set your DeepSeek API key in the Settings tab first.");
 
-    const userMsg = Prompts.categorize.buildUser(merchants);
-
-    return await callWithRetry(apiKey, userMsg, 3);
+    const results = {};
+    for (let i = 0; i < merchants.length; i += BATCH_SIZE) {
+      const chunk = merchants.slice(i, i + BATCH_SIZE);
+      const userMsg = Prompts.categorize.buildUser(chunk);
+      const batch = await callWithRetry(apiKey, userMsg, 3);
+      Object.assign(results, batch);
+    }
+    return results;
   }
 
   async function callWithRetry(apiKey, userMsg, remaining) {
