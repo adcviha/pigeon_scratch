@@ -25,6 +25,7 @@ const AISuggest = (() => {
         body: JSON.stringify({
           model: MODEL,
           temperature: 0.1,
+          max_tokens: 8192,
           messages: [
             { role: "system", content: Prompts.categorize.system },
             { role: "user", content: userMsg },
