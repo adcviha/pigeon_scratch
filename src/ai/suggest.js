@@ -37,13 +37,17 @@ const AISuggest = (() => {
 
     if (!resp.ok) {
       let detail = "";
-      try { const e = await resp.json(); detail = e.error?.message || JSON.stringify(e); } catch (_) {}
+      try { const e = await resp.json(); detail = e.error?.message || JSON.stringify(e); } catch (_) {
+        const text = await resp.text();
+        detail = "Non-JSON response: " + text.slice(0, 300);
+      }
       throw new Error("DeepSeek API error " + resp.status + (detail ? ": " + detail : ""));
     }
 
     let data;
     try { data = await resp.json(); } catch (_) {
-      throw new Error("Failed to parse DeepSeek response as JSON.");
+      const text = await resp.text();
+      throw new Error("Failed to parse DeepSeek response as JSON. Body: " + text.slice(0, 300));
     }
 
     const content = data.choices?.[0]?.message?.content;
