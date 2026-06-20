@@ -14,6 +14,10 @@ const AISuggest = (() => {
 
     const userMsg = Prompts.categorize.buildUser(merchants);
 
+    return await callWithRetry(apiKey, userMsg, 3);
+  }
+
+  async function callWithRetry(apiKey, userMsg, remaining) {
     let resp;
     try {
       resp = await fetch(ENDPOINT, {
@@ -33,6 +37,10 @@ const AISuggest = (() => {
         }),
       });
     } catch (err) {
+      if (remaining > 1) {
+        await sleep(1500);
+        return callWithRetry(apiKey, userMsg, remaining - 1);
+      }
       throw new Error("Network error calling DeepSeek: " + err.message);
     }
 
@@ -87,6 +95,10 @@ const AISuggest = (() => {
     }
 
     return cleaned;
+  }
+
+  function sleep(ms) {
+    return new Promise(r => setTimeout(r, ms));
   }
 
   return { suggest, getKey };
