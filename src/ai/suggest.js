@@ -35,18 +35,21 @@ const AISuggest = (() => {
       throw new Error("Network error calling DeepSeek: " + err.message);
     }
 
+    let text;
+    try { text = await resp.text(); } catch (_) { text = ""; }
+
     if (!resp.ok) {
       let detail = "";
-      try { const e = await resp.json(); detail = e.error?.message || JSON.stringify(e); } catch (_) {
-        const text = await resp.text();
+      try { const e = JSON.parse(text); detail = e.error?.message || text; } catch (_) {
         detail = "Non-JSON response: " + text.slice(0, 300);
       }
       throw new Error("DeepSeek API error " + resp.status + (detail ? ": " + detail : ""));
     }
 
     let data;
-    try { data = await resp.json(); } catch (_) {
-      const text = await resp.text();
+    try {
+      data = JSON.parse(text);
+    } catch (_) {
       throw new Error("Failed to parse DeepSeek response as JSON. Body: " + text.slice(0, 300));
     }
 
