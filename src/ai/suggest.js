@@ -62,9 +62,9 @@ const AISuggest = (() => {
       parsed = JSON.parse(content);
     } catch (_) {
       const m = content.match(/\{[\s\S]*\}/);
-      if (!m) throw new Error("Could not parse categorization JSON from DeepSeek response.");
+      if (!m) throw new Error("Could not parse categorization JSON. Model returned: " + content.slice(0, 400));
       try { parsed = JSON.parse(m[0]); } catch (_) {
-        throw new Error("Could not parse categorization JSON from DeepSeek response.");
+        throw new Error("Could not parse categorization JSON. Model returned: " + content.slice(0, 400));
       }
     }
 
